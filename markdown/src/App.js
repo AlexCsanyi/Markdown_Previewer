@@ -1,45 +1,115 @@
 import React from "react";
 import "./App.css";
-import FormLabel from "react-bootstrap/FormLabel";
-import FormControl from "react-bootstrap/FormControl";
-import FormGroup from "react-bootstrap/FormGroup";
+import marked from "marked";
+import "./index.css";
+import ReactDOM from "react-dom";
 
-const marked = require("marked");
+marked.setOptions({
+  breaks: true
+});
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { markdown: "" };
+    this.state = {
+      markdown: placeholder
+    };
+    this.handleChange = this.handleChange.bind(this);
   }
-
-  updateMarkdown = function(markdown) {
-    this.setState({ markdown });
-  };
-
+  handleChange(e) {
+    this.setState({
+      markdown: e.target.value
+    });
+  }
   render() {
-    let { markdown } = this.state;
     return (
-      <div className="App container">
-        <div>
-          <FormGroup controlId="formControlsTextarea">
-            <FormLabel>
-              <h1>Markdown Input</h1>
-            </FormLabel>
-            <FormControl
-              componentClass="textarea"
-              placeholder="Enter Markdown"
-              value={markdown}
-              onChange={event => this.updateMarkdown(event.target.value)}
+      <div className="container">
+        <div className="row">
+          <div className="col-md">
+            <h1 className="bg-light">Markdown Editor</h1>
+            <Editor
+              markdown={this.state.markdown}
+              onChange={this.handleChange}
             />
-          </FormGroup>
-        </div>
-        <div>
-          <h1>Markdown Output</h1>
-          <div dangerouslySetInnerHTML={{ __html: marked(markdown) }} />
+          </div>
+          <div className="col-md">
+            <h1 className="bg-light">Preview</h1>
+            <Preview markdown={this.state.markdown} />
+          </div>
         </div>
       </div>
     );
   }
 }
 
+const Editor = props => {
+  return (
+    <textarea
+      className="form-control form-control-lg"
+      id="editor"
+      value={props.markdown}
+      onChange={props.onChange}
+      type="text"
+    />
+  );
+};
+
+const Preview = props => {
+  return (
+    <div
+      id="preview"
+      dangerouslySetInnerHTML={{ __html: marked(props.markdown) }}
+    />
+  );
+};
+
+const placeholder = `# Welcome to my React Markdown Previewer!
+
+## This is a sub-heading...
+### And here's some other cool stuff:
+  
+Heres some code, \`<div></div>\`, between 2 backticks.
+
+\`\`\`
+// this is multi-line code:
+
+function anotherExample(firstLine, lastLine) {
+  if (firstLine == '\`\`\`' && lastLine == '\`\`\`') {
+    return multiLineCode;
+  }
+}
+\`\`\`
+  
+You can also make text **bold**... whoa!
+Or _italic_.
+Or... wait for it... **_both!_**
+And feel free to go crazy ~~crossing stuff out~~.
+
+There's also [links](https://www.freecodecamp.com), and
+> Block Quotes!
+
+And if you want to get really crazy, even tables:
+
+Wild Header | Crazy Header | Another Header?
+------------ | ------------- | ------------- 
+Your content can | be here, and it | can be here....
+And here. | Okay. | I think we get it.
+
+- And of course there are lists.
+  - Some are bulleted.
+     - With different indentation levels.
+        - That look like this.
+
+
+1. And there are numbererd lists too.
+1. Use just 1s if you want! 
+1. But the list goes on...
+- Even if you use dashes or asterisks.
+* And last but not least, let's not forget embedded images:
+
+![React Logo w/ Text](https://goo.gl/Umyytc)
+`;
+
 export default App;
+
+ReactDOM.render(<App />, document.getElementById("root"));
